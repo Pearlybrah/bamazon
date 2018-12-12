@@ -2,7 +2,7 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 
-var connection = mysql.createConnection ({
+var connection = mysql.createConnection({
 
     host: "localhost",
 
@@ -12,15 +12,15 @@ var connection = mysql.createConnection ({
 
     password: "Flubber44!",
 
-    databse: "bamazonDB"
+    database: "bamazonDB"
 
 });
 
 connection.connect(function(err) {
-    //if (err) throw err;
+    if (err) throw err;
     console.log("Connected as ID " + connection.threadId);
     console.log("\n\n");
-    console.log("\n-----------Please select a category to purchase from--------------\n");
+    console.log("\n-----------Please select an Item Id to purchase from--------------\n");
     displayProducts();
 });
 
@@ -29,11 +29,12 @@ const displayProducts = () => {
     function(error, results) {
         if (error) throw error;
         console.table(results);
+        purchase();
     });
 }
 
 const purchase = () => {
-    connection.query("SELECT * FROM products", function (err, results) {
+    connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
 
         inquirer.prompt([
@@ -49,13 +50,13 @@ const purchase = () => {
         }])
         .then(function(answer) {
             let updateId = parseInt(parseInt(answer.item_Id) - 1);
-            let updateStock = parseInt(answer.stock) * results[updateId].price;
+            let updatePrice = parseInt(answer.stock) * res[updateId].price;
 
-            if (parseInt(answer.stock) <= results.stock_quantity) {
+            if (parseInt(answer.stock) <= res[updateId].stock_quantity) {
                 connection.query("UPDATE products SET ? WHERE ?",
                 [
                     {
-                        stock_quantity: (parseInt(resultsults[updateId].stock_quantity) - answer.stock)
+                        stock_quantity: (parseInt(res[updateId].stock_quantity) - answer.stock)
                     },
                     {
                         id: answer.item_Id
@@ -64,7 +65,7 @@ const purchase = () => {
                 function(err) {
                     if (err) throw err;
                     console.log("\n-----Thank you for your purchase!-----");
-                    console.log("\nYour Total is: $" + updateStock.toFixed(2) + "-----------");
+                    console.log("\nYour Total is: $" + updatePrice.toFixed(2) + "-----------");
                     connection.end();
                 });
             }

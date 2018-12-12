@@ -4,6 +4,8 @@ CREATE DATABASE bamazonDB;
 
 USE bamazonDB;
 
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Flubber44!';
+
 CREATE TABLE products (
     id INT AUTO_INCREMENT NOT NULL,
     product_name VARCHAR(100) NOT NULL,
